@@ -1,7 +1,11 @@
 #include <vector>
 #include<string>
+#include<algorithm>
+#include<random>
 #include"matrix.h"
 using namespace std;
+
+const float ETA_0=1, ALPHA=1, ETA_MIN=0.000001;
 
 class labeled_data{
     vector<pair<matrix,matrix>> dataset;
@@ -16,6 +20,7 @@ public:
     matrix getoutputmatrix(int position);
     int size();
     void addnew(pair<matrix,matrix>);
+    void shuffle_data();
     labeled_data sample(int start, int end);
 };
 

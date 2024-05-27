@@ -39,6 +39,12 @@ void labeled_data::addnew(pair<matrix,matrix> newdata){
     dataset.push_back(newdata);
 }
 
+void labeled_data::shuffle_data(){
+    random_device rd;
+    mt19937 g(rd());
+    shuffle(dataset.begin(), dataset.end(), g);
+}
+
 labeled_data labeled_data::sample(int start, int end){
     vector<pair<matrix,matrix>> sub_vector(dataset.begin() + start, dataset.begin() + end);
     labeled_data result;
@@ -135,6 +141,7 @@ network network::backprop(matrix imput, matrix output){
     vector<matrix> z;
     vector<matrix> activations;
     int n=layers.size();
+    //FEEDFORWARD pero guardando los resultados intermedios
     activations.push_back(imput);
     z.push_back(layers[0].first.T().multiply(imput).sum(layers[0].second));
     activations.push_back(sigmoid(z[0]));
@@ -142,6 +149,7 @@ network network::backprop(matrix imput, matrix output){
         z.push_back(layers[i].first.T().multiply(activations[i]).sum(layers[i].second));
         activations.push_back(sigmoid(z[i]));
     }
+    //BACKPROPAGATION
     matrix delta=activations[n].sum(output.times(-1)).hadamard(sigmoid_deriv(z[n-1]));
     gradient.setbiases(n-1,delta);
     gradient.setweights(n-1,delta.multiply(activations[n-1]));
@@ -174,7 +182,6 @@ void network::SGD(labeled_data train_data, int epochs, int minisize){
     vector<labeled_data> mini_batches;
     int start=0, end=minisize;
     for (int i = 0; i < epochs; i++){
-        //falta un shuffle
         start=0;
         for (int end = minisize; end < n; end+=minisize){
             //mini_batches.push_back(train_data.sample(start,end));
