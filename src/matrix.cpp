@@ -1,7 +1,7 @@
 #include"matrix.h"
 
-matrix::matrix(int colmn, int rows){
-    data=vector<vector<float>>(colmn,vector<float>(rows, 0));
+matrix::matrix(int colmns, int rows){
+    data=vector<vector<float>>(colmns,vector<float>(rows, 0));
 }
 
 void matrix::setvalue(int c, int r, float value){
@@ -10,6 +10,15 @@ void matrix::setvalue(int c, int r, float value){
 
 float matrix::getvalue(int c, int r){
     return data[c][r];
+}
+
+matrix matrix::getcol(int col){
+    int n=data[0].size();
+    matrix result(1,n);
+    for (int i = 0; i < n; i++){
+        result.setvalue(0,i,getvalue(col,i));
+    }
+    return result;
 }
 
 void matrix:: push_cback(vector<float> newcolmn){
@@ -44,7 +53,7 @@ matrix matrix::multiply(matrix B){
 }
 
 matrix matrix::sum(matrix B){
-    matrix C;
+    matrix C(numcols(),numrows());
     for (int i = 0; i < numcols(); i++){
         for (int j = 0; j < numrows(); j++){
            C.setvalue(i,j,getvalue(i,j)+B.getvalue(i,j));
@@ -53,11 +62,41 @@ matrix matrix::sum(matrix B){
     return C;
 }
 
+matrix matrix::times(float scalar){
+    matrix result(numcols(),numrows());
+    for (int i = 0; i < numcols(); i++){
+        for (int j = 0; j < numrows(); j++){
+            result.setvalue(i,j,scalar*getvalue(i,j));
+        } 
+    }
+    return result;
+}
+
+matrix matrix::T(){
+    matrix result(numrows(),numcols());
+    for (int i = 0; i < numcols(); i++){
+        for (int j = 0; j < numrows(); j++){
+            result.setvalue(j,i,getvalue(i,j));
+        } 
+    }
+    return result;
+}
+
+matrix matrix::hadamard(matrix B){
+    matrix result(numcols(),numrows());
+    for (int i = 0; i < numcols(); i++){
+        for (int j = 0; j < numrows(); j++){
+            result.setvalue(i,j,getvalue(i,j)*B.getvalue(i,j));
+        } 
+    }
+    return result;
+}
+
 string matrix:: tostring(){
     string output;
     for (int i = 0; i < numcols(); i++){
         for (int j = 0; j < numrows(); j++){
-            output+=to_string(getvalue(j,i))+"\t";
+            output+=to_string(getvalue(i,j))+"\t";
         }
         output+="\n";
     }
