@@ -12,16 +12,17 @@ class labeled_data{
 public: 
     labeled_data(int batch_size, int input_size, int output_size);
     labeled_data(){};
-    void setimput(int position, int coord, float value);
-    float getimput(int position, int coord);
+    void setinput(int position, int coord, float value);
+    float getinput(int position, int coord);
     void setoutput(int position, int coord, float value);
     float getoutput(int position, int coord);
-    matrix getimputmatrix(int position);
+    matrix getinputmatrix(int position);
     matrix getoutputmatrix(int position);
     int size();
     void addnew(pair<matrix,matrix>);
     void shuffle_data();
     labeled_data sample(int start, int end);
+    void show_data();
 };
 
 class network{
@@ -42,7 +43,7 @@ public:
     network by(float scalar);
     float dot(network);
     matrix feedforward(matrix a);
-    network backprop(matrix imput, matrix output);
+    network backprop(matrix input, matrix output);
     void GD(labeled_data mini_batch);
     void SGD(labeled_data train_data, int epoch, int minisize);
 };

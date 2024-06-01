@@ -7,23 +7,23 @@ labeled_data::labeled_data(int batch_size, int input_size, int output_size){
     dataset = vector<pair<matrix,matrix>>(batch_size,pair (input,output));
 }
 
-void labeled_data::setimput(int position, int coord, float value){
-    dataset[position].first.setvalue(1,coord,value);
+void labeled_data::setinput(int position, int coord, float value){
+    dataset[position].first.setvalue(0,coord,value);
 }
 
-float labeled_data::getimput(int position, int coord){
-    return dataset[position].first.getvalue(1,coord);
+float labeled_data::getinput(int position, int coord){
+    return dataset[position].first.getvalue(0,coord);
 }
 
 void labeled_data::setoutput(int position, int coord, float value){
-    dataset[position].second.setvalue(1,coord,value);
+    dataset[position].second.setvalue(0,coord,value);
 }
 
 float labeled_data::getoutput(int position, int coord){
-    return dataset[position].second.getvalue(1,coord);
+    return dataset[position].second.getvalue(0,coord);
 }
 
-matrix labeled_data::getimputmatrix(int position){
+matrix labeled_data::getinputmatrix(int position){
     return dataset[position].first;
 }
 
@@ -50,6 +50,13 @@ labeled_data labeled_data::sample(int start, int end){
     labeled_data result;
     result.dataset=sub_vector;
     return result;
+}
+
+void labeled_data::show_data(){
+    for (int i = 0; i < size(); i++){
+        cout<<dataset[i].first.tostring();
+        cout<<dataset[i].second.tostring();
+    }
 }
 
 network::network(vector<int> sizes){
@@ -136,14 +143,14 @@ matrix network::feedforward(matrix a){
     return a;
 }
 
-network network::backprop(matrix imput, matrix output){
+network network::backprop(matrix input, matrix output){
     network gradient(sizes());
     vector<matrix> z;
     vector<matrix> activations;
     int n=layers.size();
     //FEEDFORWARD pero guardando los resultados intermedios
-    activations.push_back(imput);
-    z.push_back(layers[0].first.T().multiply(imput).sum(layers[0].second));
+    activations.push_back(input);
+    z.push_back(layers[0].first.T().multiply(input).sum(layers[0].second));
     activations.push_back(sigmoid(z[0]));
     for (int i = 1; i < n; i++){
         z.push_back(layers[i].first.T().multiply(activations[i]).sum(layers[i].second));
@@ -166,9 +173,9 @@ void network::GD(labeled_data mini_batch){
     int n=mini_batch.size();
     network gradient_1, gradient_2, temp_network;
     for (int i = 0; i < n; i++){
-        gradient_1=backprop(mini_batch.getimputmatrix(i),mini_batch.getoutputmatrix(i));
+        gradient_1=backprop(mini_batch.getinputmatrix(i),mini_batch.getoutputmatrix(i));
         temp_network=sum(gradient_1.by(-eta));
-        gradient_2=temp_network.backprop(mini_batch.getimputmatrix(i),mini_batch.getoutputmatrix(i));
+        gradient_2=temp_network.backprop(mini_batch.getinputmatrix(i),mini_batch.getoutputmatrix(i));
         eta+=ALPHA*gradient_1.dot(gradient_2);
         if (eta<0){
             eta=ETA_min;
