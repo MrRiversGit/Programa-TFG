@@ -7,7 +7,7 @@ INCLUDE= -I ./include
 
 SRC_MODULES= $(wildcard $(SRCDIR)/*.cpp)
 
-CXXFLAGS= $(INCLUDE) -std=c++20 -DPLATFORM_DESKTOP
+CXXFLAGS= $(INCLUDE) -std=c++20 -DPLATFORM_DESKTOP -g
 
 OBJ = $(SRC_MODULES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
@@ -17,7 +17,7 @@ run: $(BIN)
 	./$(BIN)
 
 build: $(OBJ) $(OBJDIR)
-	$(CXX) -o $(BIN) $(OBJDIR)/*.o
+	$(CXX) -o $(BIN) $(OBJDIR)/*.o 
 
 $(OBJ): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@

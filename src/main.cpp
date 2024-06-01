@@ -23,6 +23,7 @@ int main(){
         }
         cout<< endl;
     }
+
     matrix A;
     matrix B;
     vector<float> v1={1,0};
@@ -49,12 +50,10 @@ int main(){
         learning_data.setinput(i,0,i/(float)SAMPLE);
         learning_data.setoutput(i,0,sigmoid(learning_data.getinputmatrix(i)).getvalue(0,0));
     }
-    cout<<"o";
-    learning_data.show_data();
+    //learning_data.show_data();
 
-
-
-
+    network neural(vector<int> {1,1,1});
+    neural.SGD(learning_data, 1, 10);
 
     return 0;
 
