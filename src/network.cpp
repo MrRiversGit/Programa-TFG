@@ -35,7 +35,7 @@ matrix labeled_data::getinputmatrix(int position)
 
 matrix labeled_data::getoutputmatrix(int position)
 {
-    return dataset[position].first;
+    return dataset[position].second;
 }
 
 int labeled_data::size()
@@ -78,7 +78,7 @@ network::network(vector<int> sizes)
     {
         matrix biases(1, sizes[i]);
         matrix weights(sizes[i - 1], sizes[i]);
-        layers.push_back(pair(biases, weights));
+        layers.push_back(pair(weights, biases));
     }
 }
 
@@ -186,22 +186,22 @@ network network::backprop(matrix input, matrix output)
     int n = layers.size();
     // FEEDFORWARD pero guardando los resultados intermedios
     activations.push_back(input);
-    z.push_back(layers[0].first.T().multiply(input).sum(layers[0].second));
+    z.push_back(layers[0].first.multiply(input).sum(layers[0].second));
     activations.push_back(sigmoid(z[0]));
     for (int i = 1; i < n; i++)
     {
-        z.push_back(layers[i].first.T().multiply(activations[i]).sum(layers[i].second));
+        z.push_back(layers[i].first.multiply(activations[i]).sum(layers[i].second));
         activations.push_back(sigmoid(z[i]));
     }
     // BACKPROPAGATION
     matrix delta = activations[n].sum(output.times(-1)).hadamard(sigmoid_deriv(z[n - 1]));
     gradient.setbiases(n - 1, delta);
-    gradient.setweights(n - 1, delta.multiply(activations[n - 1]));
-    for (int i = n - 1; i > 0; i--)
+    gradient.setweights(n - 1, delta.multiply(activations[n - 1].T()));
+    for (int i = n-1 ; i > 0; i--)
     {
         delta = activations[i].sum(output.times(-1)).hadamard(sigmoid_deriv(z[i - 1]));
         gradient.setbiases(i - 1, delta);
-        gradient.setweights(i - 1, delta.multiply(activations[i - 1]));
+        gradient.setweights(i - 1, delta.multiply(activations[i - 1].T()));
     }
     return gradient;
 }
@@ -221,7 +221,12 @@ void network::GD(labeled_data mini_batch)
         {
             eta = ETA_min;
         }
-        sum(gradient_1.by(-eta));
+        network result=sum(gradient_1.by(-eta));
+        for (int i = 0; i < layers.size(); i++)
+        {
+            setweights(i,result.getweights(i));
+            setbiases(i,result.getbiases(i));
+        }
     }
 }
 
@@ -239,5 +244,16 @@ void network::SGD(labeled_data train_data, int epochs, int minisize)
             GD(train_data.sample(start, end));
             start = end;
         }
+    }
+}
+
+void network::show_network(){
+    for (int i = 0; i < layers.size(); i++)
+    {
+        cout<<"capa: "<<i<<"\n";
+        cout<<"weights\n";
+        cout<<getweights(i).tostring();
+        cout<<"biases\n";
+        cout<<getbiases(i).tostring();
     }
 }

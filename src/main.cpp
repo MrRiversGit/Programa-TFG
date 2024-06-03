@@ -8,7 +8,7 @@
 
 using namespace std;
 
-const int SAMPLE=80;
+const int SAMPLE=20;
 const int INTERVAL_A=0, INTERVAL_B=1;
 
 int main(){
@@ -48,12 +48,17 @@ int main(){
     labeled_data learning_data(SAMPLE,1,1);
     for (int i = 0; i < SAMPLE; i++){
         learning_data.setinput(i,0,i/(float)SAMPLE);
-        learning_data.setoutput(i,0,sigmoid(learning_data.getinputmatrix(i)).getvalue(0,0));
+        //cout<<learning_data.getinputmatrix(i).tostring();
+        learning_data.setoutput(i,0,sigmoid_deriv(learning_data.getinputmatrix(i)).getvalue(0,0));
+        //cout<<learning_data.getoutputmatrix(i).tostring();
     }
     //learning_data.show_data();
 
-    network neural(vector<int> {1,1,1});
-    neural.SGD(learning_data, 1, 10);
+    network neural(vector<int> {1,4,1});
+    neural.setweight(0,0,0,1);
+    neural.setbias(0,0,0,0);
+    neural.SGD(learning_data,2,10);
+    //cout<<neural.getweight(0,0,0)<<"\t"<<neural.getbias(0,0,0)<<"\n";
 
     return 0;
 

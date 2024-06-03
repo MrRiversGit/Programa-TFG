@@ -94,9 +94,9 @@ matrix matrix::hadamard(matrix B){
 
 string matrix:: tostring(){
     string output;
-    for (int i = 0; i < numcols(); i++){
-        for (int j = 0; j < numrows(); j++){
-            output+=to_string(getvalue(i,j))+"\t";
+    for (int i = 0; i < numrows(); i++){
+        for (int j = 0; j < numcols(); j++){
+            output+=to_string(getvalue(j,i))+"\t";
         }
         output+="\n";
     }
