@@ -4,19 +4,19 @@
 using namespace std;
 
 class matrix{
-    vector<vector<float>> data;
+    vector<vector<double>> data;
 public:
     matrix(int colmn, int rows);
     matrix(){};
-    void setvalue(int,int,float);
-    float getvalue(int,int);
+    void setvalue(int,int,double);
+    double getvalue(int,int);
     matrix getcol(int);
-    void push_cback(vector<float>);
+    void push_cback(vector<double>);
     int numrows();
     int numcols();
     matrix multiply(matrix);
     matrix sum(matrix);
-    matrix times(float);
+    matrix times(double);
     matrix T();
     matrix hadamard(matrix);
     string tostring();

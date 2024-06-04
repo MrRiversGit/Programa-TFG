@@ -5,8 +5,9 @@
 matrix sigmoid(matrix x){
     matrix A(x.numcols(),x.numrows());
     for(int i=0; i < x.numcols(); i++){
-        for(int j=0; j < x.numrows(); j++)
+        for(int j=0; j < x.numrows(); j++){
             A.setvalue(i,j,1.0/(1.0+exp(-x.getvalue(i,j))));
+        }   
     }
     return A;
 }

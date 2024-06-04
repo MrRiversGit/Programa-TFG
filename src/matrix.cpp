@@ -1,14 +1,14 @@
 #include"matrix.h"
 
 matrix::matrix(int colmns, int rows){
-    data=vector<vector<float>>(colmns,vector<float>(rows, 0));
+    data=vector<vector<double>>(colmns,vector<double>(rows, 0));
 }
 
-void matrix::setvalue(int c, int r, float value){
+void matrix::setvalue(int c, int r, double value){
     data[c][r]=value;
 }
 
-float matrix::getvalue(int c, int r){
+double matrix::getvalue(int c, int r){
     return data[c][r];
 }
 
@@ -21,7 +21,7 @@ matrix matrix::getcol(int col){
     return result;
 }
 
-void matrix:: push_cback(vector<float> newcolmn){
+void matrix:: push_cback(vector<double> newcolmn){
     data.push_back(newcolmn);
 }
 
@@ -35,8 +35,8 @@ int matrix::numrows(){
 }
 
 matrix matrix::multiply(matrix B){
-    float result=0;
-    vector<float> results;
+    double result=0;
+    vector<double> results;
     matrix C(0,0);
     for (int i = 0; i < B.numcols(); i++){
         for (int j = 0; j < numrows(); j++){
@@ -62,7 +62,7 @@ matrix matrix::sum(matrix B){
     return C;
 }
 
-matrix matrix::times(float scalar){
+matrix matrix::times(double scalar){
     matrix result(numcols(),numrows());
     for (int i = 0; i < numcols(); i++){
         for (int j = 0; j < numrows(); j++){
