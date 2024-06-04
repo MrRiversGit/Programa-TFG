@@ -72,6 +72,15 @@ void labeled_data::show_data()
     }
 }
 
+void labeled_data::export_as_file(string file){
+    ofstream fout(file);
+    for(int i=0; i<dataset.size(); i++){
+        fout<<getinput(i,0)<<"\t";
+        fout<<getoutput(i,0)<<"\n";
+    }
+    fout.close();
+}
+
 network::network(vector<int> sizes)
 {
     for (int i = 1; i < sizes.size(); i++)
@@ -173,7 +182,7 @@ matrix network::feedforward(matrix a)
 {
     for (int i = 0; i < layers.size() - 1; i++)
     {
-        a = sigmoid(layers[i].first.T().multiply(a).sum(layers[i].second));
+        a = sigmoid(layers[i].first.multiply(a).sum(layers[i].second));
     }
     return a;
 }
@@ -203,6 +212,8 @@ network network::backprop(matrix input, matrix output)
         gradient.setbiases(i - 1, delta);
         gradient.setweights(i - 1, delta.multiply(activations[i - 1].T()));
     }
+    //cout<<"Gradiente:\n";
+    //gradient.show_network();
     return gradient;
 }
 
@@ -227,6 +238,8 @@ void network::GD(labeled_data mini_batch)
             setweights(i,result.getweights(i));
             setbiases(i,result.getbiases(i));
         }
+        //cout<<"Red:\n";
+        //show_network();
     }
 }
 
@@ -256,4 +269,15 @@ void network::show_network(){
         cout<<"biases\n";
         cout<<getbiases(i).tostring();
     }
+}
+
+labeled_data network:: generate_results(int sample){
+    labeled_data results(sample,1,1);
+    matrix input(1,1);
+    for (int i = 0; i < sample; i++){
+        input.setvalue(0,0,INTERVAL_A +(INTERVAL_B-INTERVAL_A)*i/(float)sample);
+        results.setinput(i,0,input.getvalue(0,0));
+        results.setoutput(i,0,feedforward(input).getvalue(0,0));
+    }
+    return results;
 }

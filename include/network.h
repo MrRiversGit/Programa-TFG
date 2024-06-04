@@ -2,10 +2,13 @@
 #include<string>
 #include<algorithm>
 #include<random>
+#include<fstream>
 #include"matrix.h"
 using namespace std;
 
 const float ETA_0=1, ALPHA=1, ETA_MIN=0.000001;
+const int SAMPLE=50;
+const int INTERVAL_A=-4, INTERVAL_B=4;
 
 class labeled_data{
     vector<pair<matrix,matrix>> dataset;
@@ -23,6 +26,7 @@ public:
     void shuffle_data();
     labeled_data sample(int start, int end);
     void show_data();
+    void export_as_file(string file);
 };
 
 class network{
@@ -46,4 +50,6 @@ public:
     network backprop(matrix input, matrix output);
     void GD(labeled_data mini_batch);
     void SGD(labeled_data train_data, int epoch, int minisize);
+    void show_network();
+    labeled_data generate_results(int sample);
 };
