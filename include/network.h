@@ -43,6 +43,7 @@ public:
     matrix getweights(int layer);
     double getbias(int layer, int colmn, int row);
     matrix getbiases(int layer);
+    void randomize();
     network sum(network B);
     network by(double scalar);
     double dot(network);

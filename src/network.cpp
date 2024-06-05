@@ -142,6 +142,14 @@ matrix network::getbiases(int layer)
     return layers[layer].second;
 }
 
+void network::randomize(){
+    for (int i = 0; i < layers.size(); i++)
+    {
+        layers[i].second.set_random();
+        layers[i].first.set_random();
+    }
+}
+
 network network::sum(network B)
 {
     for (int i = 0; i < layers.size(); i++)
@@ -211,12 +219,12 @@ network network::backprop(matrix input, matrix output)
     matrix delta = activations[n].sum(output.times(-1));
     if (temp1<1)
     {
-        cout<<"Delta:\n"<<delta.tostring();
+        //cout<<"Delta:\n"<<delta.tostring();
     }
     gradient.setbiases(n - 1, delta);
     if (temp1<1)
     {
-        cout<<"Activations:\n"<<activations[n - 1].T().tostring();
+        //cout<<"Activations:\n"<<activations[n - 1].T().tostring();
     }
     gradient.setweights(n - 1, delta.multiply(activations[n - 1].T()));
     for (int i = n-1 ; i > 0; i--)
@@ -225,45 +233,45 @@ network network::backprop(matrix input, matrix output)
         delta = layers[i].first.T().multiply(delta).hadamard(sigmoid_deriv(z[i - 1]));
         if (temp1<1)
         {
-            cout<<"Delta:\n"<<delta.tostring();
+            //cout<<"Delta:\n"<<delta.tostring();
         }
         gradient.setbiases(i - 1, delta);
         gradient.setweights(i - 1, delta.multiply(activations[i - 1].T()));
     }
-    if (temp1<1)
+    if (temp1==24)
     {
-    cout<<"Gradiente:\n";
-    gradient.show_network();
+    //cout<<"Gradiente:\n";
+    //gradient.show_network();
     }
     return gradient;
 }
 
 void network::GD(labeled_data mini_batch)
 {
-    double eta = 1, ALPHA = 1, ETA_min = 0.0000001;
+    double eta = 0.5;
     int n = mini_batch.size();
     network gradient_1, gradient_2, temp_network;
     for (int i = 0; i < n; i++)
     {
         temp1=i;
         gradient_1 = backprop(mini_batch.getinputmatrix(i), mini_batch.getoutputmatrix(i));
-        temp_network = sum(gradient_1.by(-eta));
-        gradient_2 = temp_network.backprop(mini_batch.getinputmatrix(i), mini_batch.getoutputmatrix(i));
-        eta += ALPHA * gradient_1.dot(gradient_2);
-        if (eta < 0)
-        {
-            eta = ETA_min;
-        }
+        //temp_network = sum(gradient_1.by(-eta));
+        //gradient_2 = temp_network.backprop(mini_batch.getinputmatrix(i), mini_batch.getoutputmatrix(i));
+        //eta += ALPHA * gradient_1.dot(gradient_2);
+        //if (eta < 0)
+        //{
+        //    eta = ETA_MIN;
+        //}
         network result=sum(gradient_1.by(-eta));
         for (int j = 0; j < layers.size(); j++)
         {
             setweights(j,result.getweights(j));
             setbiases(j,result.getbiases(j));
         }
-        if (temp1<1)
+        if (temp1==24)
         {
-            cout<<"Red:numero "<<i<<"\n";
-            show_network();
+            //cout<<"Red:numero "<<i<<"\n";
+            //show_network();
         }
     }
 }

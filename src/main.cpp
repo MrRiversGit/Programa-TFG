@@ -48,17 +48,20 @@ int main(){
         //cout<<learning_data.getinputmatrix(i).tostring();
         learning_data.setoutput(i,0,sigmoid_deriv(learning_data.getinputmatrix(i)).getvalue(0,0));
         //learning_data.setoutput(i,0,exp(learning_data.getinput(i,0)));
-        //cout<<learning_data.getoutputmatrix(i).tostring();
+        //double x=learning_data.getinputmatrix(i).getvalue(0,0);
+        //learning_data.setoutput(i,0,-x*(1+x));
+        //cout<<learning_data.getinputmatrix(i).tostring();
     }
 
     //learning_data.show_data();
 
-    network neural(vector<int> {1,4,4,1});
+    network neural(vector<int> {1,7,1});
+    neural.randomize();
     //neural.setweight(0,0,0,1);
     //neural.setbias(0,0,0,0);
     //neural.setweight(1,0,0,1);
     //neural.setbias(1,0,0,0);
-    neural.SGD(learning_data,1,25);
+    neural.SGD(learning_data,1000,5);
     //cout<<neural.getweight(0,0,0)<<"\t"<<neural.getbias(0,0,0)<<"\n";
     learning_data.export_as_file("learning_data.csv");
     neural.generate_results(SAMPLE).export_as_file("results.csv");

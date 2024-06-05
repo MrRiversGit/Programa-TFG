@@ -14,6 +14,7 @@ public:
     void push_cback(vector<double>);
     int numrows();
     int numcols();
+    void set_random();
     matrix multiply(matrix);
     matrix sum(matrix);
     matrix times(double);

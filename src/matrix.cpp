@@ -34,6 +34,14 @@ int matrix::numrows(){
     return data[0].size();
 }
 
+void matrix::set_random(){
+    for (int i = 0; i < numcols(); i++){
+        for (int j = 0; j < numrows(); j++){
+           setvalue(i,j,rand()/(RAND_MAX/4.0)-2);
+        }
+    }
+}
+
 matrix matrix::multiply(matrix B){
     double result=0;
     vector<double> results;
