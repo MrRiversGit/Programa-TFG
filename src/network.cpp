@@ -246,9 +246,8 @@ network network::backprop(matrix input, matrix output)
     return gradient;
 }
 
-void network::GD(labeled_data mini_batch)
+void network::GD(labeled_data mini_batch, double eta)
 {
-    double eta = 0.5;
     int n = mini_batch.size();
     network gradient_1, gradient_2, temp_network;
     for (int i = 0; i < n; i++)
@@ -268,15 +267,15 @@ void network::GD(labeled_data mini_batch)
             setweights(j,result.getweights(j));
             setbiases(j,result.getbiases(j));
         }
-        if (temp1==24)
+        if (temp1==4)
         {
-            //cout<<"Red:numero "<<i<<"\n";
-            //show_network();
+            cout<<"Red:numero "<<i<<"\n";
+            show_network();
         }
     }
 }
 
-void network::SGD(labeled_data train_data, int epochs, int minisize)
+void network::SGD(labeled_data train_data, int epochs, int minisize, double eta)
 {
     int n = train_data.size();
     vector<labeled_data> mini_batches;
@@ -287,7 +286,7 @@ void network::SGD(labeled_data train_data, int epochs, int minisize)
         for (int end = minisize; end < n; end += minisize)
         {
             // mini_batches.push_back(train_data.sample(start,end));
-            GD(train_data.sample(start, end));
+            GD(train_data.sample(start, end), eta);
             start = end;
         }
     }

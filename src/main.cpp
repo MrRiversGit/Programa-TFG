@@ -3,12 +3,60 @@
 #include <vector>
 #include<string>
 #include <utility>
+#include <sstream>
 #include"network.h"
 #include"utils.h"
 
 using namespace std;
 
-int main(){
+void help(){
+    cout<<"Invalid parameters.\n";
+}
+
+bool isDouble( string myString ) {
+    istringstream iss(myString);
+    double f;
+    iss >> noskipws >> f; // noskipws considers leading whitespace invalid
+    // Check the entire string was consumed and if either failbit or badbit is set
+    return iss.eof() && !iss.fail(); 
+}
+
+bool is_number(const string &s) {
+  return !s.empty() && all_of(s.begin(), s.end(), ::isdigit);
+}
+
+int main(int args, char** argv){
+    if(args<6)
+    {
+        help();
+        return 1;
+    }
+    if(!(isDouble(argv[1])&&is_number(argv[2])&&is_number(argv[3])&&is_number(argv[4])))
+    {
+        help();
+        return 1;
+    }
+    double eta=stod(argv[1]);
+    int epochs=stoi(argv[2]);
+    int mini_size=stoi(argv[3]);
+    int layer_count=stoi(argv[4]);
+    if(args!= layer_count+4)
+    {
+        help();
+        return 1;
+    }
+    vector<int> sizes;
+    for(int i=5; i<layer_count; i++)
+    {
+        if(!is_number(argv[i]))
+        {
+            help();
+            return 1;
+        }
+        sizes.push_back(stoi(argv[i]));
+    }
+
+
     /*
     vector<vector<double>> A;
     A=vector<vector<double>>(5,vector<double>(3,0));
@@ -46,7 +94,7 @@ int main(){
     for (int i = 0; i < SAMPLE; i++){
         learning_data.setinput(i,0, INTERVAL_A +(INTERVAL_B-INTERVAL_A)*i/(double)SAMPLE);
         //cout<<learning_data.getinputmatrix(i).tostring();
-        learning_data.setoutput(i,0,sigmoid_deriv(learning_data.getinputmatrix(i)).getvalue(0,0));
+        learning_data.setoutput(i,0,sigmoid(learning_data.getinputmatrix(i)).getvalue(0,0));
         //learning_data.setoutput(i,0,exp(learning_data.getinput(i,0)));
         //double x=learning_data.getinputmatrix(i).getvalue(0,0);
         //learning_data.setoutput(i,0,-x*(1+x));
@@ -55,13 +103,13 @@ int main(){
 
     //learning_data.show_data();
 
-    network neural(vector<int> {1,7,1});
+    network neural(sizes);
     neural.randomize();
     //neural.setweight(0,0,0,1);
     //neural.setbias(0,0,0,0);
     //neural.setweight(1,0,0,1);
     //neural.setbias(1,0,0,0);
-    neural.SGD(learning_data,1000,5);
+    neural.SGD(learning_data,epochs,mini_size,eta);
     //cout<<neural.getweight(0,0,0)<<"\t"<<neural.getbias(0,0,0)<<"\n";
     learning_data.export_as_file("learning_data.csv");
     neural.generate_results(SAMPLE).export_as_file("results.csv");

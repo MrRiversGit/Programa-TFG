@@ -6,7 +6,6 @@
 #include"matrix.h"
 using namespace std;
 
-const double ETA_0=1, ALPHA=1, ETA_MIN=0.000001;
 const int SAMPLE=50;
 const int INTERVAL_A=-4, INTERVAL_B=4;
 
@@ -49,8 +48,8 @@ public:
     double dot(network);
     matrix feedforward(matrix a);
     network backprop(matrix input, matrix output);
-    void GD(labeled_data mini_batch);
-    void SGD(labeled_data train_data, int epoch, int minisize);
+    void GD(labeled_data mini_batch, double eta);
+    void SGD(labeled_data train_data, int epoch, int minisize, double eta);
     void show_network();
     labeled_data generate_results(int sample);
 };
