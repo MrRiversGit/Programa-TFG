@@ -14,7 +14,7 @@ OBJ = $(SRC_MODULES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 PHONY: build run
 
 run: $(BIN)
-	./$(BIN)
+	./$(BIN) 0.25 1000 5 -1 1 50 exponential 3 1 4 1
 
 build: $(OBJ) $(OBJDIR)
 	$(CXX) -o $(BIN) $(OBJDIR)/*.o 

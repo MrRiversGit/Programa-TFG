@@ -10,7 +10,15 @@
 using namespace std;
 
 void help(){
-    cout<<"Invalid parameters.\n";
+    cout<<"The order of the parameters must be:\n";
+    cout<<"1. Learning rate.\n";
+    cout<<"2. Number of epochs.\n";
+    cout<<"3. Sample size (for SGD).\n";
+    cout<<"4. Bottom and upper limit of the interval of approximation.\n";
+    cout<<"5. Sample size (for the graph, not counting the last at the limit of the interval).\n";
+    cout<<"6. Objetive of approximation (sigmoid, sigmoid_derivative or exponential)\n";
+    cout<<"7. Number of layers and size of each one.\n";
+    cout<<"Example: 0.25 1000 5 -1 1 50 exponential 3 1 4 1 \n";
 }
 
 bool isDouble( string myString ) {
@@ -26,92 +34,78 @@ bool is_number(const string &s) {
 }
 
 int main(int args, char** argv){
-    if(args<6)
+    if(args<9)
     {
+        cout<<"Not enough parameters.\n";
         help();
         return 1;
     }
-    if(!(isDouble(argv[1])&&is_number(argv[2])&&is_number(argv[3])&&is_number(argv[4])))
+    if(!(isDouble(argv[1])&&is_number(argv[2])&&is_number(argv[3])&&isDouble(argv[4])&&isDouble(argv[5])&&is_number(argv[6])&&is_number(argv[8])))
     {
+        cout<<"Invalid parameter type.\n";
         help();
         return 1;
     }
     double eta=stod(argv[1]);
     int epochs=stoi(argv[2]);
     int mini_size=stoi(argv[3]);
-    int layer_count=stoi(argv[4]);
-    if(args!= layer_count+4)
+    double interval_min=stod(argv[4]),interval_max=stod(argv[5]);
+    int samples=stoi(argv[6]);
+    string objective=argv[7];
+    int layer_count=stoi(argv[8]);
+    if(args!= layer_count+9)
     {
+        cout<<"Number of layers and sizes not coherent.\n";
         help();
         return 1;
     }
     vector<int> sizes;
-    for(int i=5; i<layer_count; i++)
+    for(int i=9; i<layer_count+9; i++)
     {
         if(!is_number(argv[i]))
         {
+            cout<<"Layer sizes must be integers.\n";
             help();
             return 1;
         }
         sizes.push_back(stoi(argv[i]));
     }
 
-
-    /*
-    vector<vector<double>> A;
-    A=vector<vector<double>>(5,vector<double>(3,0));
-    for (int i = 0; i < A.size(); i++)
+    labeled_data learning_data(samples+1,1,1);
+    if(objective=="sigmoid")
     {
-        for (int j = 0; j < A[i].size(); j++)
+        for (int i = 0; i < samples+1; i++)
         {
-            cout<<A[i][j]<<"\t";
+            learning_data.setinput(i,0, interval_min +(interval_max-interval_min)*i/(double)samples);
+            learning_data.setoutput(i,0,sigmoid(learning_data.getinputmatrix(i)).getvalue(0,0));
         }
-        cout<< endl;
     }
-
-    matrix A;
-    matrix B;
-    vector<double> v1={1,0};
-    vector<double> v2={1,1};
-    A.push_cback(v1);
-    A.push_cback(v2);
-    B.push_cback(v2);
-    B.push_cback(v2);
-    matrix C=A.multiply(B);
-    cout<<C.tostring();
-
-    vector<int> v1={0,1,2,3,4,5,6,7,8,9};
-    vector<double> v1(5, 0);
-    vector<int> v2(v1.begin() + 1, v1.begin() + 5);
-    for (int j = 0; j < v1.size(); j++){
-            cout<<v1[j]<<endl;
+    else if(objective=="sigmoid_derivative"){
+        for (int i = 0; i < samples+1; i++)
+        {
+            learning_data.setinput(i,0, interval_min +(interval_max-interval_min)*i/(double)samples);
+            learning_data.setoutput(i,0,sigmoid_deriv(learning_data.getinputmatrix(i)).getvalue(0,0));
+        }
     }
-    matrix vector(1,4);
-    vector.setvalue(1,4,6);
-    cout<<vector.tostring();
-    */
-    labeled_data learning_data(SAMPLE,1,1);
-    for (int i = 0; i < SAMPLE; i++){
-        learning_data.setinput(i,0, INTERVAL_A +(INTERVAL_B-INTERVAL_A)*i/(double)SAMPLE);
-        //cout<<learning_data.getinputmatrix(i).tostring();
-        learning_data.setoutput(i,0,sigmoid(learning_data.getinputmatrix(i)).getvalue(0,0));
-        //learning_data.setoutput(i,0,exp(learning_data.getinput(i,0)));
-        //double x=learning_data.getinputmatrix(i).getvalue(0,0);
-        //learning_data.setoutput(i,0,-x*(1+x));
-        //cout<<learning_data.getinputmatrix(i).tostring();
+    else if(objective=="exponential"){
+        for (int i = 0; i < samples+1; i++)
+        {
+            learning_data.setinput(i,0, interval_min +(interval_max-interval_min)*i/(double)samples);
+            learning_data.setoutput(i,0,exp(learning_data.getinput(i,0)));
+        }
     }
-
-    //learning_data.show_data();
+    else
+    {
+        cout<<"Invalid objective of approximation.\n";
+        help();
+        return 1;
+    }
 
     network neural(sizes);
     neural.randomize();
-    //neural.setweight(0,0,0,1);
-    //neural.setbias(0,0,0,0);
-    //neural.setweight(1,0,0,1);
-    //neural.setbias(1,0,0,0);
     neural.SGD(learning_data,epochs,mini_size,eta);
-    //cout<<neural.getweight(0,0,0)<<"\t"<<neural.getbias(0,0,0)<<"\n";
+    neural.show_network();
     learning_data.export_as_file("learning_data.csv");
-    neural.generate_results(SAMPLE).export_as_file("results.csv");
+    neural.generate_results(samples,interval_min,interval_max).export_as_file("results.csv");
     return 0;
 }

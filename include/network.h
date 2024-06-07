@@ -1,17 +1,16 @@
 #include <vector>
-#include<string>
-#include<algorithm>
-#include<random>
-#include<fstream>
-#include"matrix.h"
+#include <string>
+#include <algorithm>
+#include <random>
+#include <fstream>
+#include "matrix.h"
 using namespace std;
 
-const int SAMPLE=50;
-const int INTERVAL_A=-4, INTERVAL_B=4;
+class labeled_data
+{
+    vector<pair<matrix, matrix>> dataset;
 
-class labeled_data{
-    vector<pair<matrix,matrix>> dataset;
-public: 
+public:
     labeled_data(int batch_size, int input_size, int output_size);
     labeled_data(){};
     void setinput(int position, int coord, double value);
@@ -21,15 +20,17 @@ public:
     matrix getinputmatrix(int position);
     matrix getoutputmatrix(int position);
     int size();
-    void addnew(pair<matrix,matrix>);
+    void addnew(pair<matrix, matrix>);
     void shuffle_data();
     labeled_data sample(int start, int end);
     void show_data();
     void export_as_file(string file);
 };
 
-class network{
-    vector<pair<matrix,matrix>> layers;
+class network
+{
+    vector<pair<matrix, matrix>> layers;
+
 public:
     network(vector<int> sizes);
     network(){};
@@ -45,11 +46,10 @@ public:
     void randomize();
     network sum(network B);
     network by(double scalar);
-    double dot(network);
     matrix feedforward(matrix a);
     network backprop(matrix input, matrix output);
     void GD(labeled_data mini_batch, double eta);
     void SGD(labeled_data train_data, int epoch, int minisize, double eta);
     void show_network();
-    labeled_data generate_results(int sample);
+    labeled_data generate_results(int sample, double interval_min, double interval_max);
 };

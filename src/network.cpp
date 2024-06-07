@@ -72,11 +72,13 @@ void labeled_data::show_data()
     }
 }
 
-void labeled_data::export_as_file(string file){
+void labeled_data::export_as_file(string file)
+{
     ofstream fout(file);
-    for(int i=0; i<dataset.size(); i++){
-        fout<<getinput(i,0)<<"\t";
-        fout<<getoutput(i,0)<<"\n";
+    for (int i = 0; i < dataset.size(); i++)
+    {
+        fout << getinput(i, 0) << "\t";
+        fout << getoutput(i, 0) << "\n";
     }
     fout.close();
 }
@@ -142,7 +144,8 @@ matrix network::getbiases(int layer)
     return layers[layer].second;
 }
 
-void network::randomize(){
+void network::randomize()
+{
     for (int i = 0; i < layers.size(); i++)
     {
         layers[i].second.set_random();
@@ -171,29 +174,14 @@ network network::by(double eta)
     return result;
 }
 
-double network::dot(network B)
-{
-    double result = 0;
-    for (int i = 0; i < layers.size(); i++)
-    {
-        result += getbiases(i).T().multiply(B.getbiases(i)).getvalue(0, 0);
-        matrix weights1 = getweights(i), weights2 = B.getweights(i);
-        for (int j = 0; j < sizes()[i]; j++)
-        {
-            result += weights1.getcol(j).T().multiply(weights2.getcol(j)).getvalue(0, 0);
-        }
-    }
-    return result;
-}
-
 matrix network::feedforward(matrix a)
 {
-    int n=layers.size();
+    int n = layers.size();
     for (int i = 0; i < n - 1; i++)
     {
         a = sigmoid(layers[i].first.multiply(a).sum(layers[i].second));
     }
-    a = layers[n-1].first.multiply(a).sum(layers[n-1].second);
+    a = layers[n - 1].first.multiply(a).sum(layers[n - 1].second);
     return a;
 }
 
@@ -208,40 +196,22 @@ network network::backprop(matrix input, matrix output)
     activations.push_back(input);
     z.push_back(layers[0].first.multiply(input).sum(layers[0].second));
     activations.push_back(sigmoid(z[0]));
-    for (int i = 1; i < n-1; i++)
+    for (int i = 1; i < n - 1; i++)
     {
         z.push_back(layers[i].first.multiply(activations[i]).sum(layers[i].second));
         activations.push_back(sigmoid(z[i]));
     }
-    z.push_back(layers[n-1].first.multiply(activations[n-1]).sum(layers[n-1].second));
-    activations.push_back(z[n-1]);
+    z.push_back(layers[n - 1].first.multiply(activations[n - 1]).sum(layers[n - 1].second));
+    activations.push_back(z[n - 1]);
     // BACKPROPAGATION
     matrix delta = activations[n].sum(output.times(-1));
-    if (temp1<1)
-    {
-        //cout<<"Delta:\n"<<delta.tostring();
-    }
     gradient.setbiases(n - 1, delta);
-    if (temp1<1)
-    {
-        //cout<<"Activations:\n"<<activations[n - 1].T().tostring();
-    }
     gradient.setweights(n - 1, delta.multiply(activations[n - 1].T()));
-    for (int i = n-1 ; i > 0; i--)
+    for (int i = n - 1; i > 0; i--)
     {
-        //cout<<"Weights\n"<<layers[i].first.tostring()<<"Delta\n"<<delta.tostring();
         delta = layers[i].first.T().multiply(delta).hadamard(sigmoid_deriv(z[i - 1]));
-        if (temp1<1)
-        {
-            //cout<<"Delta:\n"<<delta.tostring();
-        }
         gradient.setbiases(i - 1, delta);
         gradient.setweights(i - 1, delta.multiply(activations[i - 1].T()));
-    }
-    if (temp1==24)
-    {
-    //cout<<"Gradiente:\n";
-    //gradient.show_network();
     }
     return gradient;
 }
@@ -249,28 +219,16 @@ network network::backprop(matrix input, matrix output)
 void network::GD(labeled_data mini_batch, double eta)
 {
     int n = mini_batch.size();
-    network gradient_1, gradient_2, temp_network;
+    network gradient_1;
     for (int i = 0; i < n; i++)
     {
-        temp1=i;
+        temp1 = i;
         gradient_1 = backprop(mini_batch.getinputmatrix(i), mini_batch.getoutputmatrix(i));
-        //temp_network = sum(gradient_1.by(-eta));
-        //gradient_2 = temp_network.backprop(mini_batch.getinputmatrix(i), mini_batch.getoutputmatrix(i));
-        //eta += ALPHA * gradient_1.dot(gradient_2);
-        //if (eta < 0)
-        //{
-        //    eta = ETA_MIN;
-        //}
-        network result=sum(gradient_1.by(-eta));
+        network result = sum(gradient_1.by(-eta));
         for (int j = 0; j < layers.size(); j++)
         {
-            setweights(j,result.getweights(j));
-            setbiases(j,result.getbiases(j));
-        }
-        if (temp1==4)
-        {
-            cout<<"Red:numero "<<i<<"\n";
-            show_network();
+            setweights(j, result.getweights(j));
+            setbiases(j, result.getbiases(j));
         }
     }
 }
@@ -285,31 +243,33 @@ void network::SGD(labeled_data train_data, int epochs, int minisize, double eta)
         start = 0;
         for (int end = minisize; end < n; end += minisize)
         {
-            // mini_batches.push_back(train_data.sample(start,end));
             GD(train_data.sample(start, end), eta);
             start = end;
         }
     }
 }
 
-void network::show_network(){
+void network::show_network()
+{
     for (int i = 0; i < layers.size(); i++)
     {
-        cout<<"capa: "<<i<<"\n";
-        cout<<"weights\n";
-        cout<<getweights(i).tostring();
-        cout<<"biases\n";
-        cout<<getbiases(i).tostring();
+        cout << "Layer: " << i << "\n";
+        cout << "Weights\n";
+        cout << getweights(i).tostring();
+        cout << "Biases\n";
+        cout << getbiases(i).tostring();
     }
 }
 
-labeled_data network:: generate_results(int sample){
-    labeled_data results(sample,1,1);
-    matrix input(1,1);
-    for (int i = 0; i < sample; i++){
-        input.setvalue(0,0,INTERVAL_A +(INTERVAL_B-INTERVAL_A)*i/(double)sample);
-        results.setinput(i,0,input.getvalue(0,0));
-        results.setoutput(i,0,feedforward(input).getvalue(0,0));
+labeled_data network::generate_results(int sample, double interval_min, double interval_max)
+{
+    labeled_data results(sample + 1, 1, 1);
+    matrix input(1, 1);
+    for (int i = 0; i < sample + 1; i++)
+    {
+        input.setvalue(0, 0, interval_min + (interval_max - interval_min) * i / (double)sample);
+        results.setinput(i, 0, input.getvalue(0, 0));
+        results.setoutput(i, 0, feedforward(input).getvalue(0, 0));
     }
     return results;
 }
